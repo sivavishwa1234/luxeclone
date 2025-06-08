@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXE | Membership</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS content from styles.css goes here */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+
+        :root {
+            --primary-color: #e6b31e;
+            --secondary-color: #1a1a1a;
+            --accent-color: #d4af37;
+            --text-color: #f5f5f5;
+            --text-dark: #333;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --glass-bg: rgba(26, 26, 26, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f, #1f1f1f);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .background .shape {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.7;
+        }
+
+        .shape:first-child {
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            top: -50px;
+            left: -50px;
+        }
+
+        .shape:last-child {
+            background: linear-gradient(to bottom right, #8e44ad, #3498db);
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            bottom: -80px;
+            right: -60px;
+        }
+
+        .luxe-card {
+            width: 420px;
+            background: var(--glass-bg);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .luxe-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+        }
+
+        .luxe-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .tagline {
+            font-size: 0.9rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .luxe-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 0;
+            font-size: 16px;
+            color: var(--text-color);
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group textarea {
+            resize: none;
+            padding-top: 15px;
+        }
+
+        .form-group label {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus ~ label,
+        .form-group input:valid ~ label,
+        .form-group textarea:focus ~ label,
+        .form-group textarea:valid ~ label {
+            transform: translateY(-20px);
+            font-size: 12px;
+            color: var(--primary-color);
+        }
+
+        .underline {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            transition: width 0.4s ease;
+        }
+
+        .form-group input:focus ~ .underline,
+        .form-group textarea:focus ~ .underline {
+            width: 100%;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 5px;
+            height: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+        }
+
+        .validation-icon {
+            position: absolute;
+            right: 0;
+            top: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .form-group.valid .validation-icon {
+            color: var(--success-color);
+        }
+
+        .form-group.invalid .validation-icon {
+            color: var(--error-color);
+        }
+
+        .password-strength {
+            margin-top: 15px;
+        }
+
+        .strength-meter {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .strength-section {
+            height: 4px;
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .strength-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .char-counter {
+            position: absolute;
+            right: 0;
+            bottom: 5px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.3s ease;
+        }
+
+        .char-counter.warning {
+            color: var(--warning-color);
+        }
+
+        .char-counter.limit {
+            color: var(--error-color);
+        }
+
+        .luxe-button {
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            color: var(--secondary-color);
+            border: none;
+            padding: 15px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .luxe-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .luxe-button i {
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .luxe-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, var(--accent-color), var(--primary-color));
+            transition: left 0.4s ease;
+        }
+
+        .luxe-button:hover::before {
+            left: 0;
+        }
+
+        .luxe-button:hover i {
+            transform: translateX(5px);
+        }
+
+        .luxe-button:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+        }
+
+        .luxe-button:disabled::before {
+            display: none;
+        }
+
+        .social-auth {
+            margin: 30px 0;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            padding: 0 15px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        /* Password strength colors */
+        .strength-0 .strength-section:nth-child(1) {
+            background: var(--error-color);
+        }
+
+        .strength-1 .strength-section:nth-child(-n+2) {
+            background: var(--warning-color);
+        }
+
+        .strength-2 .strength-section:nth-child(-n+3) {
+            background: #f1c40f;
+        }
+
+        .strength-3 .strength-section {
+            background: var(--success-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .luxe-card {
+                width: 90%;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <div class="luxe-card">
+        <div class="brand-header">
+            <div class="logo">LUXE</div>
+            <div class="tagline">Exclusive Membership</div>
+        </div>
+        
+        <form id="registrationForm" class="luxe-form">
+            <div class="form-group">
+                <input type="text" id="fullName" name="fullName" required>
+                <label for="fullName">Full Name</label>
+                <div class="underline"></div>
+                <div id="fullNameError" class="error-message">Minimum 3 characters</div>
+                <i class="fas fa-user validation-icon"></i>
+            </div>
+            
+            <div class="form-group">
+                <input type="email" id="email" name="email" required>
+                <label for="email">Email Address</label>
+                <div class="underline"></div>
+                <div id="emailError" class="error-message">Invalid email format</div>
+                <i class="fas fa-envelope validation-icon"></i>
+            </div>
+            
+            <div class="form-group">
+                <input type="password" id="password" name="password" required>
+                <label for="password">Password</label>
+                <div class="underline"></div>
+                <div id="passwordError" class="error-message">8+ chars with number & special char</div>
+                <i class="fas fa-lock validation-icon"></i>
+                <div class="password-strength">
+                    <div class="strength-meter">
+                        <div class="strength-section"></div>
+                        <div class="strength-section"></div>
+                        <div class="strength-section"></div>
+                        <div class="strength-section"></div>
+                    </div>
+                    <div id="passwordStrengthText" class="strength-text">Password strength</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <textarea id="message" name="message" rows="3" required></textarea>
+                <label for="message">Your Message</label>
+                <div class="underline"></div>
+                <div id="messageError" class="error-message">Maximum 200 characters</div>
+                <div id="charCount" class="char-counter">0/200</div>
+            </div>
+            
+            <button type="submit" id="submitBtn" class="luxe-button" disabled>
+                <span>BECOME MEMBER</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </form>
+        
+        <div class="social-auth">
+            <div class="divider">
+                <span>OR CONTINUE WITH</span>
+            </div>
+            <div class="social-icons">
+                <div class="social-icon">
+                    <i class="fab fa-apple"></i>
+                </div>
+                <div class="social-icon">
+                    <i class="fab fa-google"></i>
+                </div>
+                <div class="social-icon">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Already have an account? <a href="#">Sign In</a>
+        </div>
+    </div>
+    
+    <script>
+        // JavaScript content from script.js goes here
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const form = document.getElementById('registrationForm');
+            const fullNameInput = document.getElementById('fullName');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const messageInput = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Error Elements
+            const fullNameError = document.getElementById('fullNameError');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const messageError = document.getElementById('messageError');
+            const charCount = document.getElementById('charCount');
+            
+            // Password strength elements
+            const strengthMeter = document.querySelector('.strength-meter');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            // Form groups for validation styling
+            const formGroups = {
+                fullName: fullNameInput.closest('.form-group'),
+                email: emailInput.closest('.form-group'),
+                password: passwordInput.closest('.form-group'),
+                message: messageInput.closest('.form-group')
+            };
+            
+            // Validation flags
+            const validation = {
+                fullName: false,
+                email: false,
+                password: false,
+                message: false
+            };
+            
+            // Event Listeners
+            fullNameInput.addEventListener('input', () => validateField('fullName', validateFullName));
+            emailInput.addEventListener('input', () => validateField('email', validateEmail));
+            passwordInput.addEventListener('input', () => validateField('password', validatePassword));
+            messageInput.addEventListener('input', () => validateField('message', validateMessage));
+            form.addEventListener('submit', handleSubmit);
+            
+            // Initialize character counter
+            updateCharCounter();
+            
+            // Validation Functions
+            function validateFullName(value) {
+                const isValid = value.trim().length >= 3;
+                fullNameError.textContent = isValid ? '' : 'Minimum 3 characters';
+                return isValid;
+            }
+            
+            function validateEmail(value) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const isValid = emailRegex.test(value.trim());
+                emailError.textContent = isValid ? '' : 'Invalid email format';
+                return isValid;
+            }
+            
+            function validatePassword(value) {
+                // At least 8 chars, 1 number, 1 special char
+                const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+                const isValid = passwordRegex.test(value);
+                passwordError.textContent = isValid ? '' : '8+ chars with number & special char';
+                
+                // Update password strength meter
+                updatePasswordStrength(value);
+                
+                return isValid;
+            }
+            
+            function updatePasswordStrength(password) {
+                let strength = 0;
+                
+                // Length check
+                if (password.length >= 8) strength++;
+                if (password.length >= 12) strength++;
+                
+                // Complexity checks
+                if (/[A-Z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+                
+                // Normalize to 0-3 scale
+                strength = Math.min(Math.floor(strength / 2), 3);
+                
+                // Update UI
+                strengthMeter.className = `strength-meter strength-${strength}`;
+                
+                // Update text
+                const strengthMessages = [
+                    "Very weak",
+                    "Weak",
+                    "Good",
+                    "Strong"
+                ];
+                strengthText.textContent = strengthMessages[strength];
+            }
+            
+            function validateMessage(value) {
+                const currentLength = value.length;
+                const maxLength = 200;
+                const isValid = currentLength <= maxLength;
+                
+                messageError.textContent = isValid ? '' : 'Maximum 200 characters';
+                updateCharCounter();
+                
+                return isValid;
+            }
+            
+            function updateCharCounter() {
+                const currentLength = messageInput.value.length;
+                const maxLength = 200;
+                charCount.textContent = `${currentLength}/${maxLength}`;
+                
+                // Update styling based on length
+                if (currentLength > maxLength) {
+                    charCount.classList.add('limit');
+                    charCount.classList.remove('warning');
+                } else if (currentLength > maxLength * 0.8) {
+                    charCount.classList.add('warning');
+                    charCount.classList.remove('limit');
+                } else {
+                    charCount.classList.remove('warning', 'limit');
+                }
+            }
+            
+            function validateField(fieldName, validationFn) {
+                const value = document.getElementById(fieldName).value;
+                const isValid = validationFn(value);
+                
+                // Update validation state
+                validation[fieldName] = isValid;
+                
+                // Update UI
+                if (value.length === 0) {
+                    formGroups[fieldName].classList.remove('valid', 'invalid');
+                    document.getElementById(`${fieldName}Error`).classList.remove('show');
+                } else {
+                    formGroups[fieldName].classList.toggle('valid', isValid);
+                    formGroups[fieldName].classList.toggle('invalid', !isValid);
+                    document.getElementById(`${fieldName}Error`).classList.toggle('show', !isValid);
+                }
+                
+                updateSubmitButton();
+            }
+            
+            function updateSubmitButton() {
+                const isFormValid = Object.values(validation).every(Boolean);
+                submitBtn.disabled = !isFormValid;
+            }
+            
+            function handleSubmit(e) {
+                e.preventDefault();
+                
+                // Validate all fields one more time before submission
+                validateField('fullName', validateFullName);
+                validateField('email', validateEmail);
+                validateField('password', validatePassword);
+                validateField('message', validateMessage);
+                
+                if (Object.values(validation).every(Boolean)) {
+                    // Form is valid, proceed with submission
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    submitBtn.disabled = true;
+                    
+                    // Simulate API call
+                    setTimeout(() => {
+                        alert('Welcome to LUXE! Your membership has been created.');
+                        form.reset();
+                        submitBtn.innerHTML = '<span>BECOME MEMBER</span><i class="fas fa-arrow-right"></i>';
+                        
+                        // Reset form groups
+                        Object.values(formGroups).forEach(group => {
+                            group.classList.remove('valid', 'invalid');
+                        });
+                        
+                        // Reset validation
+                        Object.keys(validation).forEach(key => {
+                            validation[key] = false;
+                        });
+                        
+                        updateSubmitButton();
+                        updateCharCounter();
+                        strengthMeter.className = 'strength-meter';
+                        strengthText.textContent = 'Password strength';
+                    }, 1500);
+                } else {
+                    // Scroll to the first invalid field
+                    const firstInvalid = Object.keys(validation).find(key => !validation[key]);
+                    if (firstInvalid) {
+                        document.getElementById(firstInvalid).scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        document.getElementById(firstInvalid).focus();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
